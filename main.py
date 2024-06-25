@@ -36,7 +36,7 @@ parser.add_argument('--epsilon', default=0.1, type=float,
 parser.add_argument('--pos', default='top-left', type=str,
                     help='The position of the trigger', choices=['top-left', 'top-right', 'bottom-left', 'bottom-right', 'middle', 'random'])
 parser.add_argument('--type', default='static', type=str,
-                    help='The type of the trigger', choices=['static', 'moving', 'smart'])
+                    help='The type of the trigger', choices=['static', 'moving', 'smart','hash'])
 parser.add_argument('--n_masks', default=2, type=int,
                     help='The number of masks. Only if the trigger type is smart')
 parser.add_argument('--least', action='store_true',

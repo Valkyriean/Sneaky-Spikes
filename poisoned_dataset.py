@@ -411,12 +411,12 @@ class PoisonedDataset(Dataset):
 
         return data
 
-def create_hash_trigger(self, data):
-    for di in range(data.shape[0]):
-        
-        noise = process_video_frames(data[di])
-        data[di] = clip_image(data[di],noise,1)
-    return data
+    def create_hash_trigger(self, data):
+        for di in range(data.shape[0]):
+            
+            noise = process_video_frames(data[di])
+            data[di] = clip_image(data[di],noise,0.01)
+        return data
         
 
 def create_backdoor_data_loader(args):

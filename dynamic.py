@@ -228,8 +228,14 @@ def test(args, atkmodel, scratchmodel, device,
 
                 atkdata = clip_image(frame, noise, args.beta)
                 if flag:
-                    print(noise)
-                    print(atkdata)
+                    # print(np.max(noise))
+                    # print(np.min(noise))
+                    # print(np.min(atkdata))
+                    # print(np.min(atkdata))
+                    np.savetxt("noise.csv", noise.flatten(), delimiter=",")
+                    np.savetxt("atkdata.csv", atkdata.flatten(), delimiter=",")
+
+
                     flag=False
                 functional.reset_net(atkmodel)
 
