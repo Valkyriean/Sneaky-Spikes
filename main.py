@@ -7,7 +7,7 @@ from utils import loss_picker, optimizer_picker, backdoor_model_trainer, save_ex
 from torch.cuda import amp
 from spikingjelly.activation_based import functional, neuron
 import random
-# import cupy
+import cupy
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', type=str,
