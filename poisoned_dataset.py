@@ -7,6 +7,9 @@ import torch
 import numpy as np
 import copy
 from torchvision import transforms
+import hashlib
+
+
 
 
 class PoisonedDataset(Dataset):
@@ -129,6 +132,9 @@ class PoisonedDataset(Dataset):
             elif type == 'smart':
                 new_data[perm] = self.create_smart_trigger(
                     new_data[perm], size_height, height, width, new_data)
+            elif type == "hash":
+                new_data[perm] = self.create_hash_trigger(
+                    new_data[perm])
             else:
                 raise Exception('Invalid Trigger Type')
 
@@ -143,7 +149,7 @@ class PoisonedDataset(Dataset):
     def create_static_trigger(self, data, size_width, size_height, width, height):
         pos = self.pos
         polarity = self.polarity
-
+        # print("======>",data.shape)
         if pos == 'top-left':
             x_begin = 0
             x_end = size_width
@@ -405,6 +411,13 @@ class PoisonedDataset(Dataset):
 
         return data
 
+def create_hash_trigger(self, data):
+    for di in range(data.shape[0]):
+        
+        noise = process_video_frames(data[di])
+        data[di] = clip_image(data[di],noise,1)
+    return data
+        
 
 def create_backdoor_data_loader(args):
 
@@ -478,6 +491,54 @@ def create_backdoor_data_loader_adaptive(args):
 
     return clean_trainloader, bk_trainloader, test_data_ori_loader, test_data_tri_loader
 
+
+
+def clip_image(image, noise, eps):
+    '''
+    Clip the noise so its l infinity norm is less than eps
+    noise shape: [T, N, C, H, W]
+    image shape: [T, N, C, H, W]
+    '''
+    noise = noise * eps
+    return noise + image
+
+def matrix_to_bytes(matrix):
+    """将34x34矩阵展平成字节序列"""
+    flattened = matrix.flatten()
+    return flattened.tobytes()
+
+def hash_matrix(matrix):
+    byte_data = matrix_to_bytes(matrix)
+    
+    # 使用SHA-256哈希函数
+    hash_obj = hashlib.sha256(byte_data)
+    hash_digest = hash_obj.digest()
+    
+    # 如果哈希结果不足需要的长度，重复哈希结果直到长度足够
+    hash_data = bytearray()
+    while len(hash_data) < 1156 * 4:  # 1156个整数，每个4字节
+        hash_data.extend(hash_digest)
+        hash_obj.update(hash_digest)
+        hash_digest = hash_obj.digest()
+    
+    # 截取所需长度
+    hash_data = hash_data[:1156 * 4]
+    
+    # 将字节序列转换为整数数组，再转换为34x34矩阵
+    hashed_matrix = np.frombuffer(hash_data, dtype=np.int32).reshape((34, 34))
+    return hashed_matrix
+
+def process_video_frames(input_data):
+    # 创建一个相同形状的数组来存储结果
+    output_data = np.empty_like(input_data, dtype=np.int32)
+    
+    for frame_idx in range(input_data.shape[0]):
+        for color_idx in range(input_data.shape[1]):
+            original_matrix = input_data[frame_idx, color_idx, :, :]
+            hashed_matrix = hash_matrix(original_matrix)
+            output_data[frame_idx, color_idx, :, :] = hashed_matrix
+    
+    return output_data
 
 def get_masks(H, W, n, n_masks):
 

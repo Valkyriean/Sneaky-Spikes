@@ -1,9 +1,9 @@
 spikingjelly
 matplotlib
-numpy==1.19.5
+numpy
 pandas
 seaborn
 rarfile
 unrar
 scikit-image
-cupy
+# cupy

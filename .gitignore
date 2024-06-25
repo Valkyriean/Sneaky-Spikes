@@ -138,3 +138,4 @@ data/
 *.txt
 *.out
 !requirements.txt
+.DS_Store

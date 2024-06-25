@@ -12,7 +12,7 @@ from spikingjelly.datasets import play_frame
 import os
 import csv
 import random
-import cupy
+# import cupy
 from torchvision import transforms
 
 parser = argparse.ArgumentParser()
@@ -208,6 +208,8 @@ def test(args, atkmodel, scratchmodel, device,
     bk_label_one_hot = F.one_hot(torch.tensor(
         args.trigger_label).long(), n_classes).float()
 
+    flag =True
+    
     # Train the model from scratch
     for i in range(trainepoch):
         for batch_idx, (frame, label) in enumerate(train_loader):
@@ -223,7 +225,12 @@ def test(args, atkmodel, scratchmodel, device,
             testoptimizer.zero_grad()
             with torch.no_grad():
                 noise = atkmodel(frame)
+
                 atkdata = clip_image(frame, noise, args.beta)
+                if flag:
+                    print(noise)
+                    print(atkdata)
+                    flag=False
                 functional.reset_net(atkmodel)
 
             clean_output = scratchmodel(frame).mean(0)

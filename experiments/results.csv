@@ -1,0 +1,2 @@
+dataset,least,most_polarity,seed,epsilon,pos,polarity,trigger_size,trigger_label,loss,optimizer,batch_size,type,epochs,train_acc,test_acc_clean,test_acc_backdoor
+mnist,False,False,42,0.1,top-left,1,0.1,0,0.07925111365318298,adam,16,static,10,0.326,0.29,0.953
