@@ -415,7 +415,7 @@ class PoisonedDataset(Dataset):
         for di in range(data.shape[0]):
             
             noise = process_video_frames(data[di])
-            data[di] = clip_image(data[di],noise,0.01)
+            data[di] = clip_image(data[di],noise,0.001)
         return data
         
 

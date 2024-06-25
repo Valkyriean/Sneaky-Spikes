@@ -72,3 +72,7 @@ Gorka Abad, Oguzhan Ersoy, Stjepan Picek, and Aitor Urbieta.
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+
+conda install -c conda-forge cupy
+conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
