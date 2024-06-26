@@ -134,7 +134,7 @@ class PoisonedDataset(Dataset):
                     new_data[perm], size_height, height, width, new_data)
             elif type == "hash":
                 new_data[perm] = self.create_hash_trigger(
-                    new_data[perm])
+                    new_data[perm],trigger_size)
             else:
                 raise Exception('Invalid Trigger Type')
 
@@ -411,11 +411,12 @@ class PoisonedDataset(Dataset):
 
         return data
 
-    def create_hash_trigger(self, data):
+
+    def create_hash_trigger(self, data, trigger_size):
         for di in range(data.shape[0]):
             
             noise = process_video_frames(data[di])
-            data[di] = clip_image(data[di],noise,0.001)
+            data[di] = clip_image(data[di],noise,trigger_size)
         return data
         
 

@@ -1,3 +1,1 @@
 dataset,seed,alpha,beta,epochs,trigger_label,loss,optimizer,batch_size,train_epochs,test_acc_clean,test_acc_backdoor,best_epoch
-mnist,42,0.5,0.01,1,0,mse,adam,8,1,0.1,1.0,0
-mnist,42,0.5,0.01,1,0,mse,adam,8,1,0.1,1.0,0

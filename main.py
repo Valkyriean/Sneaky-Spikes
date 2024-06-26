@@ -54,19 +54,24 @@ parser.add_argument('--model_path', type=str, default=None,
 parser.add_argument('--seed', type=int, default=42, help='Random seed')
 args = parser.parse_args()
 
+def print_memory_usage():
+    print(f"Allocated memory: {torch.cuda.memory_allocated() / 1024 ** 2} MB")
+    print(f"Cached memory: {torch.cuda.memory_reserved() / 1024 ** 2} MB")
+
 
 def main():
+    print_memory_usage()
     # Set random seed
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
     random.seed(args.seed)
-
+    print_memory_usage()
     # Set the device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(device)
     # Load the model
     model = get_model(args.dataset, args.T)
-
+    print_memory_usage()
     if args.model_path is not None:
         model = torch.load(args.model_path)
 
@@ -85,10 +90,12 @@ def main():
     scaler = None
     if args.amp:
         scaler = amp.GradScaler()
-
+    # print(f"Allocated memory: {torch.cuda.memory_allocated() / 1024 ** 2} MB")
+    # print(f"Cached memory: {torch.cuda.memory_reserved() / 1024 ** 2} MB")
     poison_trainloader, clean_testloader, poison_testloader = create_backdoor_data_loader(
         args)
-
+    # print(f"Allocated memory: {torch.cuda.memory_allocated() / 1024 ** 2} MB")
+    # print(f"Cached memory: {torch.cuda.memory_reserved() / 1024 ** 2} MB")
     list_train_loss, list_train_acc, list_test_loss, list_test_acc, list_test_loss_backdoor, list_test_acc_backdoor = backdoor_model_trainer(
         model, criterion, optimizer, args.epochs, poison_trainloader, clean_testloader,
         poison_testloader, device, scaler, scheduler)
@@ -100,3 +107,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
