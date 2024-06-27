@@ -90,12 +90,8 @@ def main():
     scaler = None
     if args.amp:
         scaler = amp.GradScaler()
-    # print(f"Allocated memory: {torch.cuda.memory_allocated() / 1024 ** 2} MB")
-    # print(f"Cached memory: {torch.cuda.memory_reserved() / 1024 ** 2} MB")
     poison_trainloader, clean_testloader, poison_testloader = create_backdoor_data_loader(
         args)
-    # print(f"Allocated memory: {torch.cuda.memory_allocated() / 1024 ** 2} MB")
-    # print(f"Cached memory: {torch.cuda.memory_reserved() / 1024 ** 2} MB")
     list_train_loss, list_train_acc, list_test_loss, list_test_acc, list_test_loss_backdoor, list_test_acc_backdoor = backdoor_model_trainer(
         model, criterion, optimizer, args.epochs, poison_trainloader, clean_testloader,
         poison_testloader, device, scaler, scheduler)
