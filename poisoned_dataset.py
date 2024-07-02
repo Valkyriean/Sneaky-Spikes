@@ -473,7 +473,62 @@ class PoisonedDataset(Dataset):
             data[di] = clip_image(data[di],noise,trigger_size)
         return data
         
+    def create_blink_trigger(self, data, size_width, size_height, width, height):
+        pos = self.pos
+        polarity = self.polarity
+        if pos == 'top-left':
+            x_begin = 0
+            x_end = size_width
+            y_begin = 0
+            y_end = size_height
 
+        elif pos == 'top-right':
+            x_begin = int(width - size_width)
+            x_end = width
+            y_begin = 0
+            y_end = size_height
+
+        elif pos == 'bottom-left':
+            x_begin = 0
+            x_end = size_width
+            y_begin = int(height - size_height)
+            y_end = height
+
+        elif pos == 'bottom-right':
+            x_begin = int(width - size_width)
+            x_end = width
+            y_begin = int(height - size_height)
+            y_end = height
+
+        elif pos == 'middle':
+            x_begin = int((width - size_width) / 2)
+            x_end = int((width + size_width) / 2)
+            y_begin = int((height - size_height) / 2)
+            y_end = int((height + size_height) / 2)
+
+        elif pos == 'random':
+            x_begin = np.random.randint(0, int(width-size_width))
+            x_end = x_begin + size_width
+            y_begin = np.random.randint(0, int(height - size_height))
+            y_end = y_begin + size_height
+
+        # The shape of the data is (N, T, C, H, W)
+        for di in range(data.shape[0]):
+            if polarity == 0:
+                data[:, di, :, y_begin:y_end, x_begin:x_end] = 0
+            elif polarity == 1:
+                data[:, di, 0, y_begin:y_end, x_begin:x_end] = 0
+                data[:, di, 1, y_begin:y_end, x_begin:x_end] = 1
+            elif polarity == 2:
+                data[:, di, 0, y_begin:y_end, x_begin:x_end] = 1
+                data[:, di, 1, y_begin:y_end, x_begin:x_end] = 0
+            else:
+                data[:, di, :, y_begin:y_end, x_begin:x_end] = 1
+        return data
+        
+       
+
+        return data
 def create_backdoor_data_loader(args):
 
     # Get the dataset
