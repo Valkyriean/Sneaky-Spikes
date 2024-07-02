@@ -126,6 +126,12 @@ class PoisonedDataset(Dataset):
             if type == 'static':
                 new_data[perm] = self.create_static_trigger(
                     new_data[perm], size_width, size_height, width, height)
+            elif type == "shr":
+                new_data[perm] = self.create_hash_static_trigger1(
+                    new_data[perm], size_width, size_height, width, height)
+            elif type == "shs":
+                new_data[perm] = self.create_hash_static_trigger2(
+                    new_data[perm], size_width, size_height, width, height)
             elif type == 'moving':
                 new_data[perm] = self.create_moving_trigger(
                     new_data[perm], size_width, size_height, height, width)
@@ -146,63 +152,63 @@ class PoisonedDataset(Dataset):
 
         return torch.Tensor(new_data), new_targets
 
-    # def create_static_trigger(self, data, size_width, size_height, width, height):
-    #     pos = self.pos
-    #     polarity = self.polarity
-    #     # print("======>",data.shape)
-    #     if pos == 'top-left':
-    #         x_begin = 0
-    #         x_end = size_width
-    #         y_begin = 0
-    #         y_end = size_height
-
-    #     elif pos == 'top-right':
-    #         x_begin = int(width - size_width)
-    #         x_end = width
-    #         y_begin = 0
-    #         y_end = size_height
-
-    #     elif pos == 'bottom-left':
-    #         x_begin = 0
-    #         x_end = size_width
-    #         y_begin = int(height - size_height)
-    #         y_end = height
-
-    #     elif pos == 'bottom-right':
-    #         x_begin = int(width - size_width)
-    #         x_end = width
-    #         y_begin = int(height - size_height)
-    #         y_end = height
-
-    #     elif pos == 'middle':
-    #         x_begin = int((width - size_width) / 2)
-    #         x_end = int((width + size_width) / 2)
-    #         y_begin = int((height - size_height) / 2)
-    #         y_end = int((height + size_height) / 2)
-
-    #     elif pos == 'random':
-    #         x_begin = np.random.randint(0, int(width-size_width))
-    #         x_end = x_begin + size_width
-    #         y_begin = np.random.randint(0, int(height - size_height))
-    #         y_end = y_begin + size_height
-
-    #     # The shape of the data is (N, T, C, H, W)
-    #     if polarity == 0:
-    #         data[:, :, :, y_begin:y_end, x_begin:x_end] = 0
-    #     elif polarity == 1:
-    #         data[:, :, 0, y_begin:y_end, x_begin:x_end] = 0
-    #         data[:, :, 1, y_begin:y_end, x_begin:x_end] = 1
-    #     elif polarity == 2:
-    #         data[:, :, 0, y_begin:y_end, x_begin:x_end] = 1
-    #         data[:, :, 1, y_begin:y_end, x_begin:x_end] = 0
-    #     else:
-    #         data[:, :, :, y_begin:y_end, x_begin:x_end] = 1
-
-    #     return data
-
-
-
     def create_static_trigger(self, data, size_width, size_height, width, height):
+        pos = self.pos
+        polarity = self.polarity
+        # print("======>",data.shape)
+        if pos == 'top-left':
+            x_begin = 0
+            x_end = size_width
+            y_begin = 0
+            y_end = size_height
+
+        elif pos == 'top-right':
+            x_begin = int(width - size_width)
+            x_end = width
+            y_begin = 0
+            y_end = size_height
+
+        elif pos == 'bottom-left':
+            x_begin = 0
+            x_end = size_width
+            y_begin = int(height - size_height)
+            y_end = height
+
+        elif pos == 'bottom-right':
+            x_begin = int(width - size_width)
+            x_end = width
+            y_begin = int(height - size_height)
+            y_end = height
+
+        elif pos == 'middle':
+            x_begin = int((width - size_width) / 2)
+            x_end = int((width + size_width) / 2)
+            y_begin = int((height - size_height) / 2)
+            y_end = int((height + size_height) / 2)
+
+        elif pos == 'random':
+            x_begin = np.random.randint(0, int(width-size_width))
+            x_end = x_begin + size_width
+            y_begin = np.random.randint(0, int(height - size_height))
+            y_end = y_begin + size_height
+
+        # The shape of the data is (N, T, C, H, W)
+        if polarity == 0:
+            data[:, :, :, y_begin:y_end, x_begin:x_end] = 0
+        elif polarity == 1:
+            data[:, :, 0, y_begin:y_end, x_begin:x_end] = 0
+            data[:, :, 1, y_begin:y_end, x_begin:x_end] = 1
+        elif polarity == 2:
+            data[:, :, 0, y_begin:y_end, x_begin:x_end] = 1
+            data[:, :, 1, y_begin:y_end, x_begin:x_end] = 0
+        else:
+            data[:, :, :, y_begin:y_end, x_begin:x_end] = 1
+
+        return data
+
+
+
+    def create_hash_static_trigger1(self, data, size_width, size_height, width, height):
         pos = self.pos
         
         if pos == 'top-left':
@@ -254,6 +260,75 @@ class PoisonedDataset(Dataset):
                     data[n, t, c, y_begin:y_end, x_begin:x_end] = binary_frame
 
         return data
+    
+    def create_hash_static_trigger2(self, data, size_width, size_height, width, height):
+        pos = self.pos
+        
+        if pos == 'top-left':
+            x_begin = 0
+            x_end = size_width
+            y_begin = 0
+            y_end = size_height
+
+        elif pos == 'top-right':
+            x_begin = int(width - size_width)
+            x_end = width
+            y_begin = 0
+            y_end = size_height
+
+        elif pos == 'bottom-left':
+            x_begin = 0
+            x_end = size_width
+            y_begin = int(height - size_height)
+            y_end = height
+
+        elif pos == 'bottom-right':
+            x_begin = int(width - size_width)
+            x_end = width
+            y_begin = int(height - size_height)
+            y_end = height
+
+        elif pos == 'middle':
+            x_begin = int((width - size_width) / 2)
+            x_end = int((width + size_width) / 2)
+            y_begin = int((height - size_height) / 2)
+            y_end = int((height + size_height) / 2)
+
+        elif pos == 'random':
+            x_begin = np.random.randint(0, int(width - size_width))
+            x_end = x_begin + size_width
+            y_begin = np.random.randint(0, int(height - size_height))
+            y_end = y_begin + size_height
+
+        # The shape of the data is (N, T, C, H, W)
+        N, T, C, H, W = data.shape
+
+        for n in range(N):
+            for t in range(T):
+                # for c in range(C):
+                frame = data[n,t, 0, y_begin:y_end, x_begin:x_end]+ data[n,t, 1, y_begin:y_end, x_begin:x_end]
+                hashed_frame = hash_frame(frame)
+                # Normalize hashed_frame to binary (0 or 1) values
+                # binary_frame = (hashed_frame % 2).astype(np.uint8)
+                # data[n, t, c, y_begin:y_end, x_begin:x_end] = binary_frame
+                binary_frame = (hashed_frame % 4).astype(np.uint8)
+                for x in range(binary_frame.shape[0]):
+                    for y in range(binary_frame.shape[1]):
+                        print(binary_frame)
+                        polarity = binary_frame[x][y]
+                        print(polarity)
+                        if polarity == 0:
+                            data[n, t, :, y_begin+y, x_begin+x] = 0
+                        elif polarity == 1:
+                            data[n, t, 0, y_begin+y, x_begin+x] = 0
+                            data[n, t, 1, y_begin+y, x_begin+x] = 1
+                        elif polarity == 2:
+                            data[n, t, 0, y_begin+y, x_begin+x] = 1
+                            data[n, t, 1, y_begin+y, x_begin+x] = 0
+                        else:
+                            data[n, :, :, y_begin+y, x_begin+x] = 1
+        return data
+    
     def create_moving_trigger(self, data, size_x, size_y, height, width):
         pos = self.pos
         polarity = self.polarity
