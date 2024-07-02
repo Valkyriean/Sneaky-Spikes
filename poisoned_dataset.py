@@ -314,9 +314,9 @@ class PoisonedDataset(Dataset):
                 binary_frame = (hashed_frame % 4).astype(np.uint8)
                 for x in range(binary_frame.shape[0]):
                     for y in range(binary_frame.shape[1]):
-                        print(binary_frame)
+                        # print(binary_frame)
                         polarity = binary_frame[x][y]
-                        print(polarity)
+                        # print(polarity)
                         if polarity == 0:
                             data[n, t, :, y_begin+y, x_begin+x] = 0
                         elif polarity == 1:
