@@ -146,10 +146,65 @@ class PoisonedDataset(Dataset):
 
         return torch.Tensor(new_data), new_targets
 
+    # def create_static_trigger(self, data, size_width, size_height, width, height):
+    #     pos = self.pos
+    #     polarity = self.polarity
+    #     # print("======>",data.shape)
+    #     if pos == 'top-left':
+    #         x_begin = 0
+    #         x_end = size_width
+    #         y_begin = 0
+    #         y_end = size_height
+
+    #     elif pos == 'top-right':
+    #         x_begin = int(width - size_width)
+    #         x_end = width
+    #         y_begin = 0
+    #         y_end = size_height
+
+    #     elif pos == 'bottom-left':
+    #         x_begin = 0
+    #         x_end = size_width
+    #         y_begin = int(height - size_height)
+    #         y_end = height
+
+    #     elif pos == 'bottom-right':
+    #         x_begin = int(width - size_width)
+    #         x_end = width
+    #         y_begin = int(height - size_height)
+    #         y_end = height
+
+    #     elif pos == 'middle':
+    #         x_begin = int((width - size_width) / 2)
+    #         x_end = int((width + size_width) / 2)
+    #         y_begin = int((height - size_height) / 2)
+    #         y_end = int((height + size_height) / 2)
+
+    #     elif pos == 'random':
+    #         x_begin = np.random.randint(0, int(width-size_width))
+    #         x_end = x_begin + size_width
+    #         y_begin = np.random.randint(0, int(height - size_height))
+    #         y_end = y_begin + size_height
+
+    #     # The shape of the data is (N, T, C, H, W)
+    #     if polarity == 0:
+    #         data[:, :, :, y_begin:y_end, x_begin:x_end] = 0
+    #     elif polarity == 1:
+    #         data[:, :, 0, y_begin:y_end, x_begin:x_end] = 0
+    #         data[:, :, 1, y_begin:y_end, x_begin:x_end] = 1
+    #     elif polarity == 2:
+    #         data[:, :, 0, y_begin:y_end, x_begin:x_end] = 1
+    #         data[:, :, 1, y_begin:y_end, x_begin:x_end] = 0
+    #     else:
+    #         data[:, :, :, y_begin:y_end, x_begin:x_end] = 1
+
+    #     return data
+
+
+
     def create_static_trigger(self, data, size_width, size_height, width, height):
         pos = self.pos
-        polarity = self.polarity
-        # print("======>",data.shape)
+        
         if pos == 'top-left':
             x_begin = 0
             x_end = size_width
@@ -181,25 +236,24 @@ class PoisonedDataset(Dataset):
             y_end = int((height + size_height) / 2)
 
         elif pos == 'random':
-            x_begin = np.random.randint(0, int(width-size_width))
+            x_begin = np.random.randint(0, int(width - size_width))
             x_end = x_begin + size_width
             y_begin = np.random.randint(0, int(height - size_height))
             y_end = y_begin + size_height
 
         # The shape of the data is (N, T, C, H, W)
-        if polarity == 0:
-            data[:, :, :, y_begin:y_end, x_begin:x_end] = 0
-        elif polarity == 1:
-            data[:, :, 0, y_begin:y_end, x_begin:x_end] = 0
-            data[:, :, 1, y_begin:y_end, x_begin:x_end] = 1
-        elif polarity == 2:
-            data[:, :, 0, y_begin:y_end, x_begin:x_end] = 1
-            data[:, :, 1, y_begin:y_end, x_begin:x_end] = 0
-        else:
-            data[:, :, :, y_begin:y_end, x_begin:x_end] = 1
+        N, T, C, H, W = data.shape
+
+        for n in range(N):
+            for t in range(T):
+                for c in range(C):
+                    frame = data[n, t, c, y_begin:y_end, x_begin:x_end]
+                    hashed_frame = hash_frame(frame)
+                    # Normalize hashed_frame to binary (0 or 1) values
+                    binary_frame = (hashed_frame % 2).astype(np.uint8)
+                    data[n, t, c, y_begin:y_end, x_begin:x_end] = binary_frame
 
         return data
-
     def create_moving_trigger(self, data, size_x, size_y, height, width):
         pos = self.pos
         polarity = self.polarity
@@ -507,6 +561,26 @@ def matrix_to_bytes(matrix):
     """将34x34矩阵展平成字节序列"""
     flattened = matrix.flatten()
     return flattened.tobytes()
+
+def hash_frame(frame):
+    byte_data = frame.tobytes()
+    
+    # 使用SHA-256哈希函数
+    hash_obj = hashlib.sha256(byte_data)
+    hash_digest = hash_obj.digest()
+    
+    # 如果哈希结果不足需要的长度，重复哈希结果直到长度足够
+    hash_data = bytearray()
+    while len(hash_data) < frame.size:  # frame.size是像素的数量
+        hash_data.extend(hash_digest)
+        hash_obj.update(hash_digest)
+        hash_digest = hash_obj.digest()
+    
+    # 截取所需长度并将字节序列转换为整数数组
+    hash_data = hash_data[:frame.size]
+    hashed_frame = np.frombuffer(hash_data, dtype=np.uint8).reshape(frame.shape)
+    
+    return hashed_frame
 
 def hash_matrix(matrix):
     byte_data = matrix_to_bytes(matrix)
