@@ -54,24 +54,18 @@ parser.add_argument('--model_path', type=str, default=None,
 parser.add_argument('--seed', type=int, default=42, help='Random seed')
 args = parser.parse_args()
 
-def print_memory_usage():
-    print(f"Allocated memory: {torch.cuda.memory_allocated() / 1024 ** 2} MB")
-    print(f"Cached memory: {torch.cuda.memory_reserved() / 1024 ** 2} MB")
 
 
 def main():
-    print_memory_usage()
     # Set random seed
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
     random.seed(args.seed)
-    print_memory_usage()
     # Set the device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(device)
     # Load the model
     model = get_model(args.dataset, args.T)
-    print_memory_usage()
     if args.model_path is not None:
         model = torch.load(args.model_path)
 
