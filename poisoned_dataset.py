@@ -126,6 +126,9 @@ class PoisonedDataset(Dataset):
             if type == 'static':
                 new_data[perm] = self.create_static_trigger(
                     new_data[perm], size_width, size_height, width, height)
+            elif type == "rs":
+                new_data[perm] = self.create_random_static_trigger(
+                    new_data[perm], size_width, size_height, width, height)
             elif type == "shr":
                 new_data[perm] = self.create_hash_static_trigger1(
                     new_data[perm], size_width, size_height, width, height)
@@ -260,6 +263,57 @@ class PoisonedDataset(Dataset):
                     data[n, t, c, y_begin:y_end, x_begin:x_end] = binary_frame
 
         return data
+    
+    def create_random_static_trigger(self, data, size_width, size_height, width, height):
+        pos = self.pos
+        
+        if pos == 'top-left':
+            x_begin = 0
+            x_end = size_width
+            y_begin = 0
+            y_end = size_height
+
+        elif pos == 'top-right':
+            x_begin = int(width - size_width)
+            x_end = width
+            y_begin = 0
+            y_end = size_height
+
+        elif pos == 'bottom-left':
+            x_begin = 0
+            x_end = size_width
+            y_begin = int(height - size_height)
+            y_end = height
+
+        elif pos == 'bottom-right':
+            x_begin = int(width - size_width)
+            x_end = width
+            y_begin = int(height - size_height)
+            y_end = height
+
+        elif pos == 'middle':
+            x_begin = int((width - size_width) / 2)
+            x_end = int((width + size_width) / 2)
+            y_begin = int((height - size_height) / 2)
+            y_end = int((height + size_height) / 2)
+
+        elif pos == 'random':
+            x_begin = np.random.randint(0, int(width - size_width))
+            x_end = x_begin + size_width
+            y_begin = np.random.randint(0, int(height - size_height))
+            y_end = y_begin + size_height
+
+        # The shape of the data is (N, T, C, H, W)
+        N, T, C, H, W = data.shape
+
+        for n in range(N):
+            for t in range(T):
+                for c in range(C):
+                    binary_frame = torch.randint(0, 2, (y_end - y_begin, x_end - x_begin), dtype=torch.uint8)
+                    data[n, t, c, y_begin:y_end, x_begin:x_end] = binary_frame
+        return data
+    
+    
     
     def create_hash_static_trigger2(self, data, size_width, size_height, width, height):
         pos = self.pos

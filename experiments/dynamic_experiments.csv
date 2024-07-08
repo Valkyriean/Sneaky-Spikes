@@ -1,2 +1,2 @@
 dataset,seed,alpha,beta,epochs,trigger_label,loss,optimizer,batch_size,train_epochs,test_acc_clean,test_acc_backdoor,best_epoch
-mnis42,0.5,0.01,10,0,mse,adam,8,1,0.9828,1.0,0
+mnis,42,0.5,0.01,10,0,mse,adam,8,1,0.9828,1.0,0
