@@ -36,7 +36,7 @@ parser.add_argument('--epsilon', default=0.1, type=float,
 parser.add_argument('--pos', default='top-left', type=str,
                     help='The position of the trigger', choices=['top-left', 'top-right', 'bottom-left', 'bottom-right', 'middle', 'random'])
 parser.add_argument('--type', default='static', type=str,
-                    help='The type of the trigger', choices=['static', 'moving', 'smart','hash','shr','shs','rs'])
+                    help='The type of the trigger', choices=['static', 'moving', 'smart','hash','shr','shs','rs','blink'])
 parser.add_argument('--n_masks', default=2, type=int,
                     help='The number of masks. Only if the trigger type is smart')
 parser.add_argument('--least', action='store_true',
@@ -52,6 +52,8 @@ parser.add_argument('--save_path', type=str,
 parser.add_argument('--model_path', type=str, default=None,
                     help='Use a pretrained model')
 parser.add_argument('--seed', type=int, default=42, help='Random seed')
+parser.add_argument('--frame_gap', default=1, type=int,
+                    help='Inject trigger into every x frames')
 args = parser.parse_args()
 
 

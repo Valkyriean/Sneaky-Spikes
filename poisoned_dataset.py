@@ -15,7 +15,7 @@ import hashlib
 class PoisonedDataset(Dataset):
 
     def __init__(self, dataset, trigger_label=0, mode='train', epsilon=0.1, pos='top-left', attack_type='static', time_step=16,
-                 trigger_size=0.1, dataname='mnist', polarity=0, n_masks=2, least=False, most_polarity=False):
+                 trigger_size=0.1, dataname='mnist', polarity=0, n_masks=2, least=False, most_polarity=False, frame_gap = 1):
 
         # Handle special case for CIFAR10 and Caltech101
         if type(dataset) == torch.utils.data.Subset:
@@ -67,6 +67,7 @@ class PoisonedDataset(Dataset):
         self.pos = pos
         self.polarity = polarity
         self.n_masks = n_masks
+        self.frame_gap = frame_gap
 
         self.data, self.targets = self.add_trigger(
             trigger_label, epsilon, mode, attack_type, trigger_size
@@ -144,6 +145,9 @@ class PoisonedDataset(Dataset):
             elif type == "hash":
                 new_data[perm] = self.create_hash_trigger(
                     new_data[perm],trigger_size)
+            elif type == "blink":
+                new_data[perm] = self.create_blink_trigger(
+                    new_data[perm], size_width, size_height, width, height)
             else:
                 raise Exception('Invalid Trigger Type')
 
@@ -636,23 +640,28 @@ class PoisonedDataset(Dataset):
             y_end = int((height + size_height) / 2)
 
         elif pos == 'random':
-            x_begin = np.random.randint(0, int(width-size_width))
+            x_begin = np.random.randint(0, int(width - size_width))
             x_end = x_begin + size_width
             y_begin = np.random.randint(0, int(height - size_height))
             y_end = y_begin + size_height
 
         # The shape of the data is (N, T, C, H, W)
-        for di in range(data.shape[0]):
-            if polarity == 0:
-                data[:, di, :, y_begin:y_end, x_begin:x_end] = 0
-            elif polarity == 1:
-                data[:, di, 0, y_begin:y_end, x_begin:x_end] = 0
-                data[:, di, 1, y_begin:y_end, x_begin:x_end] = 1
-            elif polarity == 2:
-                data[:, di, 0, y_begin:y_end, x_begin:x_end] = 1
-                data[:, di, 1, y_begin:y_end, x_begin:x_end] = 0
-            else:
-                data[:, di, :, y_begin:y_end, x_begin:x_end] = 1
+        N, T, C, H, W = data.shape
+
+
+        for t in range(T):
+            if t % self.frame_gap == 0:
+                if polarity == 0:
+                    data[:, t, :, y_begin:y_end, x_begin:x_end] = 0
+                elif polarity == 1:
+                    data[:, t, 0, y_begin:y_end, x_begin:x_end] = 0
+                    data[:, t, 1, y_begin:y_end, x_begin:x_end] = 1
+                elif polarity == 2:
+                    data[:, t, 0, y_begin:y_end, x_begin:x_end] = 1
+                    data[:, t, 1, y_begin:y_end, x_begin:x_end] = 0
+                else:
+                    data[:,t, :, y_begin:y_end, x_begin:x_end] = 1
+
         return data
         
        
@@ -666,17 +675,17 @@ def create_backdoor_data_loader(args):
     train_data = PoisonedDataset(train_data, args.trigger_label, mode='train', epsilon=args.epsilon,
                                  pos=args.pos, attack_type=args.type, time_step=args.T,
                                  trigger_size=args.trigger_size, dataname=args.dataset,
-                                 polarity=args.polarity, n_masks=args.n_masks, least=args.least, most_polarity=args.most_polarity)
+                                 polarity=args.polarity, n_masks=args.n_masks, least=args.least, most_polarity=args.most_polarity, frame_gap = args.frame_gap)
 
     test_data_ori = PoisonedDataset(test_data, args.trigger_label, mode='test', epsilon=0,
                                     pos=args.pos, attack_type=args.type, time_step=args.T,
                                     trigger_size=args.trigger_size, dataname=args.dataset,
-                                    polarity=args.polarity, n_masks=args.n_masks, least=args.least, most_polarity=args.most_polarity)
+                                    polarity=args.polarity, n_masks=args.n_masks, least=args.least, most_polarity=args.most_polarity, frame_gap = args.frame_gap)
 
     test_data_tri = PoisonedDataset(test_data, args.trigger_label, mode='test', epsilon=1,
                                     pos=args.pos, attack_type=args.type, time_step=args.T,
                                     trigger_size=args.trigger_size, dataname=args.dataset,
-                                    polarity=args.polarity, n_masks=args.n_masks, least=args.least, most_polarity=args.most_polarity)
+                                    polarity=args.polarity, n_masks=args.n_masks, least=args.least, most_polarity=args.most_polarity, frame_gap = args.frame_gap)
 
     frame, label = test_data_tri[0]
     play_frame(frame, 'backdoor.gif')
