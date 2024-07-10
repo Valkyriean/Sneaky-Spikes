@@ -246,8 +246,8 @@ def save_experiments(args, train_acc, train_loss, test_acc_clean, test_loss_clea
     path = '{}/results.csv'.format(args.save_path)
     header = ['dataset', 'least', 'most_polarity', 'seed', 'epsilon', 'pos',
               'polarity', 'trigger_size', 'trigger_label',
-              'loss', 'optimizer', 'batch_size', 'type', 'epochs',
-              'train_acc', 'test_acc_clean', 'test_acc_backdoor']
+              'loss', 'optimizer', 'batch_size', 'type', 'epochs', 
+              'train_acc', 'test_acc_clean', 'test_acc_backdoor', 'frame_gaps']
 
     if not os.path.exists(path):
         with open(path, 'w') as f:
@@ -260,7 +260,7 @@ def save_experiments(args, train_acc, train_loss, test_acc_clean, test_loss_clea
         writer.writerow([args.dataset, args.least, args.most_polarity, args.seed, args.epsilon, args.pos,
                          args.polarity, args.trigger_size, args.trigger_label,
                          train_loss[-1], args.optim, args.batch_size, args.type, args.epochs,
-                         train_acc[-1], test_acc_clean[-1], test_acc_backdoor[-1]])
+                         train_acc[-1], test_acc_clean[-1], test_acc_backdoor[-1], args.frame_gap])
 
     # Create a folder for the experiment, named after the experiment
     path = path_name(args)
