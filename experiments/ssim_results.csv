@@ -1,0 +1,15 @@
+dataset,epsilon,pos,polarity,trigger_size,type,frame_gaps,ssim
+
+mnist,1,top-left,3,0.01,static,2,0.9999917149543762
+
+mnist,1,top-left,1,0.1,static,1,0.9952746033668518
+
+mnist,1,top-left,1,0.1,rs,1,0.9939156174659729
+
+mnist,1,top-left,1,0.1,blink,2,0.9976515769958496
+
+mnist,1,top-left,1,0.1,blink,2,0.9976515769958496
+
+mnist,1,top-left,3,0.01,static,2,0.9999505877494812
+
+mnist,1,top-left,3,0.1,static,2,0.9903555512428284

@@ -54,11 +54,7 @@ cifar10,False,False,42,0.1,top-left,1,0.1,0,0.01350331404681007,adam,16,static,2
 
 mnist,False,False,42,0.01,top-left,1,0.1,0,0.0007212102379264934,adam,16,blink,10,0.9963166666666666,0.9938,1.0,7
 
-mnist,False,False,42,0.01,top-left,1,0.1,0,0.0007159099036229008,adam,16,blink,10,0.9963,0.9936,1.0,8
-mnist,False,False,42,0.1,top-left,1,0.01,0,0.0006282136156430321,adam,16,static,10,0.997,0.994,1.0,1
-mnist,1,top-left,1,0.1,static,1,0.9952746033668518
-mnist,1,top-left,1,0.1,rs,1,0.9939156174659729
-mnist,1,top-left,1,0.1,blink,2,0.9976515769958496
-mnist,1,top-left,1,0.1,blink,2,0.9976515769958496
-mnist,1,top-left,3,0.01,static,2,0.9999505877494812
-mnist,1,top-left,3,0.1,static,2,0.9903555512428284
+mnist,False,False,42,0.01,top-left,1,0.1,0,0.0007159099036229008,adam,16,blink,10,0.9963,0.9936,1.0,8
+
+mnist,False,False,42,0.1,top-left,1,0.01,0,0.0006282136156430321,adam,16,static,10,0.997,0.994,1.0,1
+
