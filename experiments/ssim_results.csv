@@ -31,3 +31,5 @@ mnist,1,top-left,1,0.1,blink,6,0.9991310834884644
 mnist,1,top-left,1,0.1,blink,7,0.9991213083267212
 mnist,1,top-left,1,0.1,blink,8,0.9994208812713623
 mnist,1,top-left,3,0.1,static,1,0.9903813600540161
+mnist,1,top-left,3,0.1,moving,1,0.9890011548995972
+mnist,1,top-left,1,0.1,moving,1,0.9945685267448425
