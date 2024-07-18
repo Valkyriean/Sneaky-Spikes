@@ -139,3 +139,4 @@ data/
 *.out
 !requirements.txt
 .DS_Store
+*.gif

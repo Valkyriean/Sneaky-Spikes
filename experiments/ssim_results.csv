@@ -13,3 +13,21 @@ mnist,1,top-left,1,0.1,blink,2,0.9976515769958496
 mnist,1,top-left,3,0.01,static,2,0.9999505877494812
 
 mnist,1,top-left,3,0.1,static,2,0.9903555512428284
+mnist,1,top-left,1,0.1,static,1,0.9992165565490723
+
+mnist,1,top-left,1,0.1,rs,1,0.998986542224884
+mnist,1,top-left,3,0.01,static,2,0.9999917149543762
+
+mnist,1,top-left,1,0.1,static,1,0.9952999949455261
+mnist,1,top-left,1,0.1,rs,1,0.9939029216766357
+
+mnist,1,top-left,3,0.01,static,2,0.9999505877494812
+
+mnist,1,top-left,1,0.1,blink,2,0.9976650476455688
+mnist,1,top-left,1,0.1,blink,3,0.9982470870018005
+mnist,1,top-left,1,0.1,blink,4,0.9988334774971008
+mnist,1,top-left,1,0.1,blink,5,0.998848557472229
+mnist,1,top-left,1,0.1,blink,6,0.9991310834884644
+mnist,1,top-left,1,0.1,blink,7,0.9991213083267212
+mnist,1,top-left,1,0.1,blink,8,0.9994208812713623
+mnist,1,top-left,3,0.1,static,1,0.9903813600540161
