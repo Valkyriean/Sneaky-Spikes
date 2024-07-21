@@ -3,6 +3,7 @@
 
 #SBATCH --job-name="hash"
 #SBATCH --partition=cybersecurity
+#SBATCH --nodelist=cyberstation1.csit.local
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=4
@@ -15,9 +16,12 @@
 
 # Load any required modules (environments, libraries etc.)
 eval "$(conda 'shell.bash' 'hook' 2> /dev/null)" # initialize conda
-conda activate spikingjelly
+conda activate spikingjelly2
 
-srun python main.py --dataset mnist --polarity 1 --pos top-left --trigger_size 0.1 --epsilon 0.1 --type static --cupy --epochs 10
+srun python main.py --dataset cifar10 --polarity 1 --pos top-left --trigger_size 0.1 --epsilon 0.1 --type static --cupy --epochs 28
+
 
 # srun python main.py --dataset mnist --trigger_size 0.01 --epsilon 0.1 --type static --cupy --epochs 10
 # srun python memtest.py
+
+srun --partition=cybersecurity --nodelist=cyberstation1.csit.local --nodes=1 --ntasks-per-node=1 --time=01:00:00 --mem=24G --gres=gpu:1 --pty bash -i

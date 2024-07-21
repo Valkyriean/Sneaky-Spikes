@@ -6,5 +6,5 @@ seaborn
 rarfile
 unrar
 scikit-image
-cupy
+# cupy
 
