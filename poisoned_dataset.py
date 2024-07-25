@@ -702,43 +702,39 @@ def create_backdoor_data_loader(args):
 
 def create_backdoor_data_loader_adaptive(args):
 
-    # Get the dataset
     train_data, test_data = get_dataset(args.dataset, args.T, args.data_dir)
 
-    clean_trainset = PoisonedDataset(train_data, args.trigger_label, mode='train', epsilon=0,
-                                     pos=args.pos, attack_type=args.type, time_step=args.T,
-                                     trigger_size=args.trigger_size, dataname=args.dataset,
-                                     polarity=args.polarity, n_masks=args.n_masks, least=args.least, most_polarity=args.most_polarity)
+    train_data = PoisonedDataset(train_data, args.trigger_label, mode='train', epsilon=args.epsilon,
+                                 pos=args.pos, attack_type=args.type, time_step=args.T,
+                                 trigger_size=args.trigger_size, dataname=args.dataset,
+                                 polarity=args.polarity, n_masks=args.n_masks, least=args.least, most_polarity=args.most_polarity, frame_gap=args.frame_gap)
 
-    bk_trainset = PoisonedDataset(train_data, args.trigger_label, mode='train', epsilon=1,
-                                  pos=args.pos, attack_type=args.type, time_step=args.T,
-                                  trigger_size=args.trigger_size, dataname=args.dataset,
-                                  polarity=args.polarity, n_masks=args.n_masks, least=args.least, most_polarity=args.most_polarity)
-
+    train_data_loader = DataLoader(
+        dataset=train_data, batch_size=args.batch_size, shuffle=True, num_workers=4, pin_memory=True)
+    train_data = None
+    
     test_data_ori = PoisonedDataset(test_data, args.trigger_label, mode='test', epsilon=0,
                                     pos=args.pos, attack_type=args.type, time_step=args.T,
                                     trigger_size=args.trigger_size, dataname=args.dataset,
-                                    polarity=args.polarity, n_masks=args.n_masks, least=args.least, most_polarity=args.most_polarity)
+                                    polarity=args.polarity, n_masks=args.n_masks, least=args.least, most_polarity=args.most_polarity, frame_gap=args.frame_gap)
+
+    test_data_ori_loader = DataLoader(
+        dataset=test_data_ori, batch_size=args.batch_size, shuffle=False, num_workers=4, pin_memory=True)
+
+    test_data_ori = None
 
     test_data_tri = PoisonedDataset(test_data, args.trigger_label, mode='test', epsilon=1,
                                     pos=args.pos, attack_type=args.type, time_step=args.T,
                                     trigger_size=args.trigger_size, dataname=args.dataset,
-                                    polarity=args.polarity, n_masks=args.n_masks, least=args.least, most_polarity=args.most_polarity)
+                                    polarity=args.polarity, n_masks=args.n_masks, least=args.least, most_polarity=args.most_polarity, frame_gap=args.frame_gap)
 
     frame, label = test_data_tri[0]
     play_frame(frame, 'backdoor.gif')
 
-    clean_trainloader = DataLoader(
-        dataset=clean_trainset, batch_size=args.batch_size, shuffle=True, num_workers=1)
-    bk_trainloader = DataLoader(
-        dataset=bk_trainset, batch_size=args.batch_size, shuffle=True, num_workers=1)
-    test_data_ori_loader = DataLoader(
-        dataset=test_data_ori, batch_size=args.batch_size, shuffle=False, num_workers=1)
     test_data_tri_loader = DataLoader(
-        dataset=test_data_tri, batch_size=args.batch_size, shuffle=False, num_workers=1)
+        dataset=test_data_tri, batch_size=args.batch_size, shuffle=False, num_workers=4, pin_memory=True)
 
-    return clean_trainloader, bk_trainloader, test_data_ori_loader, test_data_tri_loader
-
+    return train_data_loader, test_data_ori_loader, test_data_tri_loader
 
 
 def clip_image(image, noise, eps):

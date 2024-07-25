@@ -18,7 +18,8 @@
 eval "$(conda 'shell.bash' 'hook' 2> /dev/null)" # initialize conda
 conda activate spikingjelly2
 
-srun python main.py --dataset caltech --polarity 1 --pos top-left --trigger_size 0.1 --epsilon 0.1 --type static --cupy --epochs 30
+srun python main.py --dataset gesture --polarity 1 --pos top-left --trigger_size 0.1 --epsilon 0.01 --type blink --frame_gap 2 --cupy --epochs 100
+
 
 
 
